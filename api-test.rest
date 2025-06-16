@@ -1,0 +1,38 @@
+POST http://localhost:8000/api/v1/auth/register/
+Content-Type: application/json
+
+{
+    "first_name":"Edmond",
+    "last_name":"Yeboah",
+    "email":"hopefuledi@gmail.com",
+    "phone_number":"0553880722",
+    "password":"password",
+    "role":"1"
+}
+
+
+###
+POST http://localhost:8000/api/v1/auth/login/
+Content-Type: application/json
+
+{
+    "phone_number":"0553880722",
+    "password":"password"
+}
+
+###
+POST  http://localhost:8000/api/v1/auth/generate-otp/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxMjE3MjAyLCJpYXQiOjE3NDEyMTcwMjIsImp0aSI6IjM1OTk5ZDYwYjNkMjRlMDFiNWFjZmRkZWI1OWE1NjY1IiwidXNlcl9pZCI6MjB9.ML-CcFis7FsF9_PvgndWyGM1vCMTY9BdvD1mLGhX4hM
+
+
+###
+POST http://localhost:8000/api/v1/auth/verify-otp/
+Content-Type: application/json
+Authorization: Bearer  eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQwNDk4NTM1LCJpYXQiOjE3NDA0OTQ5MzUsImp0aSI6ImFjYjZmNTJjMmRiZDRiNzE5MjA5MzI2MmQzNzRiZjM3IiwidXNlcl9pZCI6MjB9.eGiCKxJgaARojtqwCatZrdDwEMBK-_xLKpnQjrHCpNg
+
+
+{
+    "token":"518068"
+}
+

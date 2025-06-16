@@ -1,0 +1,22 @@
+databases:
+  - name: solarUdb
+    plan: free
+    databaseName: solar
+    user: edmond
+
+services:
+  - type: web
+    plan: free
+    name: solarApi
+    runtime: python
+    buildCommand: './build.sh'
+    startCommand: 'python -m gunicorn solar_U_api.asgi:application -k uvicorn.workers.UvicornWorker'
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: solarUdb
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
