@@ -14,7 +14,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-# from appFunctions import timediff
+from appFunctions import timediff
 import jwt
 # from auditlogs.models import auditTrail
 from django.contrib.auth.hashers import check_password
@@ -35,27 +35,60 @@ class Login(APIView):
         responses={201: UserSerializer()}
     )
     def post(self, request, format=None):
-        phone_number = request.data['phone_number']
+
+        secret_key = pyotp.random_base32()
+        totp = pyotp.TOTP(secret_key)
+        otp = totp.now()
+
+        email = request.data['email']
         password = request.data['password']
 
-        if phone_number is not None and password is not None:
+        if email is not None and password is not None:
 
             authenticated_user = authenticate(
-                request, phone_number=phone_number, password=password)
+                request, username=email, password=password)
 
             if authenticated_user is not None:
                 # serialize user and generate jwt tokens
-                serializer = UserSerializer(authenticated_user)
-                refreshToken = RefreshToken.for_user(authenticated_user)
-                accessToken = str(refreshToken.access_token)
+                # serializer = UserSerializer(authenticated_user)
+                # refreshToken = RefreshToken.for_user(authenticated_user)
+                # accessToken = str(refreshToken.access_token)
+
+                try:
+                    user = CustomUser.objects.get(username=request.user.email)
+                    user.otp = otp
+                    user.otp_expiry = timezone.now()
+
+                    user.save()
+
+                    context = {
+                        "user": user.first_name,
+                        "code": otp
+                    }
+
+                    template_name = 'otp_email.html'
+                    convert_to_html_content = render_to_string(
+                        template_name=template_name,
+                        context=context
+                    )
+                    plain_message = strip_tags(convert_to_html_content)
+
+                    send_mail("SolarU Login Code", message=plain_message,
+                              from_email=settings.EMAIL_HOST, recipient_list=[request.user.email], html_message=convert_to_html_content, fail_silently=False)
+
+                except Exception as e:
+                    return Response({
+                        "responseCode": "111",
+                        "responseMessage": e,
+                    })
 
                 return Response({
                     "responseCode": "000",
-                    "responseMessage": "User login successful",
-                    "data": {"user": serializer.data,
-                             "accessToken": accessToken,
-                             "refreshToken": str(refreshToken)
-                             }
+                    "responseMessage": "Verification email sent successfully",
+                    # "data": {"user": serializer.data,
+                    #             "accessToken": accessToken,
+                    #             "refreshToken": str(refreshToken)
+                    #             }
                 })
             else:
                 return Response({
@@ -193,6 +226,9 @@ class VerifyOTP(APIView):
 
         user = CustomUser.objects.get(username=request.user.email)
 
+        refreshToken = RefreshToken.for_user(user)
+        accessToken = str(refreshToken.access_token)
+
         otp_datetime = user.otp_expiry
 
         serializer = UserSerializer(user)
@@ -213,10 +249,18 @@ class VerifyOTP(APIView):
                     user.save()
                 except Exception as e:
                     print("here", e)
+                # return Response({
+                #     "responseCode": "000",
+                #     "responseMessage": "Token verified successfully",
+                #     "data": serializer.data
+                # })
                 return Response({
                     "responseCode": "000",
                     "responseMessage": "Token verified successfully",
-                    "data": serializer.data
+                    "data": {"user": serializer.data,
+                             "accessToken": accessToken,
+                             "refreshToken": str(refreshToken)
+                             }
                 })
             else:
                 return Response({
@@ -334,7 +378,7 @@ class verifyResetPasswordLink(APIView):
 
 class ResetPassword(APIView):
     '''
-    A class to verify the password reset link
+    A class to reset password
 
     post: reset password
     '''
@@ -344,23 +388,22 @@ class ResetPassword(APIView):
     @swagger_auto_schema(
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            required=['token', 'password'],
+            required=['password'],
             properties={
-                'token': openapi.Schema(type=openapi.TYPE_STRING),
                 'password': openapi.Schema(type=openapi.TYPE_STRING)
             },
         ),
         responses={201: 'Password reset successful'}
     )
     def post(self, request, format=None):
-        token = request.data['token']
+        # token = request.data['token']
         password = request.data['password']
 
         try:
-            payload = jwt.decode(token, options={"verify_signature": False})
-            theUser = payload.get('user_id')
+            # payload = jwt.decode(token, options={"verify_signature": False})
+            theUser = request.user.email
 
-            user = get_object_or_404(CustomUser, id=theUser)
+            user = get_object_or_404(CustomUser, email=theUser)
             user.set_password(password)
             user.save()
 

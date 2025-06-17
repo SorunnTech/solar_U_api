@@ -162,7 +162,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #MY SETTINGS
 
 AUTHENTICATION_BACKENDS = [
-    'solar_U_api.backends.PhoneNumberAuthBackend',  # Custom backend
+    # 'solar_U_api.backends.PhoneNumberAuthBackend',  # Custom backend
     'django.contrib.auth.backends.ModelBackend',  # Default backend (fallback)
 ]
 
