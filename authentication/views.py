@@ -55,7 +55,7 @@ class Login(APIView):
                 # accessToken = str(refreshToken.access_token)
 
                 try:
-                    user = CustomUser.objects.get(username=request.user.email)
+                    user = CustomUser.objects.get(username=email)
                     user.otp = otp
                     user.otp_expiry = timezone.now()
 
@@ -74,12 +74,12 @@ class Login(APIView):
                     plain_message = strip_tags(convert_to_html_content)
 
                     send_mail("SolarU Login Code", message=plain_message,
-                              from_email=settings.EMAIL_HOST, recipient_list=[request.user.email], html_message=convert_to_html_content, fail_silently=False)
+                                from_email=settings.EMAIL_HOST, recipient_list=[email], html_message=convert_to_html_content, fail_silently=False)
 
                 except Exception as e:
                     return Response({
                         "responseCode": "111",
-                        "responseMessage": e,
+                        "responseMessage": "Email could not be sent",
                     })
 
                 return Response({
@@ -118,6 +118,8 @@ class Register(APIView):
     )
     def post(self, request, format=None):
         userRole = get_object_or_404(user_roles, id=request.data['role'])
+        print(userRole)
+        # return Response("hello")
 
         # create a new user
         try:
@@ -130,29 +132,33 @@ class Register(APIView):
                 role=userRole,
                 password=request.data['password']
             )
+            return Response({
+                "responseCode": "000",
+                "responseMessage": "User registration successful",
+            })
         except Exception as e:
             return Response({
                 "responseCode": "111",
-                "responseMessage": e,
+                "responseMessage": "An error occured "
             })
 
         # authenticate user
-        authenticated_user = authenticate(
-            request, phone_number=request.data['phone_number'], password=request.data['password'])
+        # authenticated_user = authenticate(
+        #     request, username=request.data['email'], password=request.data['password'])
 
-        # serialize user and generate jwt tokens
-        serializer = UserSerializer(authenticated_user)
-        refreshToken = RefreshToken.for_user(authenticated_user)
-        accessToken = str(refreshToken.access_token)
+        # # serialize user and generate jwt tokens
+        # serializer = UserSerializer(authenticated_user)
+        # refreshToken = RefreshToken.for_user(authenticated_user)
+        # accessToken = str(refreshToken.access_token)
 
-        return Response({
-            "responseCode": "000",
-            "responseMessage": "User registered successfully",
-            "data": {"user": serializer.data,
-                     "accessToken": accessToken,
-                     "refreshToken": str(refreshToken)
-                     }
-        })
+        # return Response({
+        #     "responseCode": "000",
+        #     "responseMessage": "User registered successfully",
+        #     "data": {"user": serializer.data,
+        #              "accessToken": accessToken,
+        #              "refreshToken": str(refreshToken)
+        #              }
+        # })
 
 
 class GenerateOTP(APIView):
