@@ -24,6 +24,7 @@ urlpatterns = [
     #apps urls
     path('api/v1/auth/', include('authentication.urls')),
     path('api/v1/role/', include('roles.urls')),
+    path('api/v1/user/', include('users.urls')),
 
 
     #jwt urls

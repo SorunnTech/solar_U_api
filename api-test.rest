@@ -36,3 +36,19 @@ Authorization: Bearer  eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoi
     "token":"518068"
 }
 
+
+###
+POST http://localhost:8000/api/v1/user/users/
+Content-Type: application/json
+
+{
+    "first_name":"John",
+    "last_name":"Yeboah",
+    "email":"shoes@gmail.com",
+    "phone_number":"0553880713",
+    "password":"password",
+    "role":"1"
+}
+
+###
+GET http://localhost:8000/api/v1/user/users/

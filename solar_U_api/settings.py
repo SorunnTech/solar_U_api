@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from datetime import timedelta
 import os
 from pathlib import Path
-import dj_database_url 
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,7 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CORS_ORIGIN_ALLOW_ALL = True #added to handle cors policy errors
+CORS_ORIGIN_ALLOW_ALL = True  # added to handle cors policy errors
 
 
 # Application definition
@@ -42,23 +42,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    #apps
+
+    # apps
     'authentication',
     'roles',
-    
-    #packages
+    'users',
+
+    # packages
     'drf_yasg',
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders'
-    
+
 ]
 
 MIDDLEWARE = [
-    #added to handle cors policy errors
+    # added to handle cors policy errors
     'corsheaders.middleware.CorsMiddleware',
-    
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -66,8 +67,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
-    'whitenoise.middleware.WhiteNoiseMiddleware', 
+
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'solar_U_api.urls'
@@ -95,15 +96,15 @@ WSGI_APPLICATION = 'solar_U_api.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-    # 'default': dj_database_url.config(
-    #     # Replace this value with your local database's connection string.
-    #     default='postgresql://postgres:postgres@localhost:5432/solar_U',
-    #     conn_max_age=600
-    # )
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
+    'default': dj_database_url.config(
+        # Replace this value with your local database's connection string.
+        default='postgresql://postgres:postgres@localhost:5432/solar_U',
+        conn_max_age=600
+    )
 }
 
 
@@ -150,8 +151,8 @@ if not DEBUG:
     # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use
     # and renames the files with unique names for each version to support long-term caching
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    
-STATIC_ROOT='progressive-eva-createx-19bc74d6.koyeb.app/static/'
+
+STATIC_ROOT = 'progressive-eva-createx-19bc74d6.koyeb.app/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -159,7 +160,7 @@ STATIC_ROOT='progressive-eva-createx-19bc74d6.koyeb.app/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-#MY SETTINGS
+# MY SETTINGS
 
 AUTHENTICATION_BACKENDS = [
     # 'solar_U_api.backends.PhoneNumberAuthBackend',  # Custom backend
@@ -171,12 +172,12 @@ AUTH_USER_MODEL = "authentication.CustomUser"
 
 # REST FRAMEWORK CONFIG
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    # 'DEFAULT_AUTHENTICATION_CLASSES': (
-    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',
     # ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }
 
 
