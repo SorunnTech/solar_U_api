@@ -74,7 +74,7 @@ class Login(APIView):
                     plain_message = strip_tags(convert_to_html_content)
 
                     send_mail("SolarU Login Code", message=plain_message,
-                                from_email=settings.EMAIL_HOST, recipient_list=[email], html_message=convert_to_html_content, fail_silently=False)
+                              from_email=settings.EMAIL_HOST, recipient_list=[email], html_message=convert_to_html_content, fail_silently=False)
 
                 except Exception as e:
                     return Response({
@@ -217,20 +217,29 @@ class VerifyOTP(APIView):
     post:Verify OTP
     '''
 
+    permission_classes = [AllowAny]
+
     @swagger_auto_schema(
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            required=['token'],
+            required=['token', 'email'],
             properties={
                 'token': openapi.Schema(type=openapi.TYPE_STRING),
+                'email': openapi.Schema(type=openapi.FORMAT_EMAIL)
             },
         ),
-        security=[{'Bearer': []}],
+        # security=[{'Bearer': []}],
         responses={201: UserSerializer()}
     )
     def post(self, request, format=None):
+        try:
 
-        user = CustomUser.objects.get(username=request.user.email)
+            user = CustomUser.objects.get(username=request.data['email'])
+        except Exception as e:
+            return Response({
+                "responseCode": "111",
+                "responseMessage": "Could not get  user"
+            })
 
         refreshToken = RefreshToken.for_user(user)
         accessToken = str(refreshToken.access_token)
