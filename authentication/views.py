@@ -50,9 +50,9 @@ class Login(APIView):
 
             if authenticated_user is not None:
                 # serialize user and generate jwt tokens
-                # serializer = UserSerializer(authenticated_user)
-                # refreshToken = RefreshToken.for_user(authenticated_user)
-                # accessToken = str(refreshToken.access_token)
+                serializer = UserSerializer(authenticated_user)
+                refreshToken = RefreshToken.for_user(authenticated_user)
+                accessToken = str(refreshToken.access_token)
 
                 try:
                     user = CustomUser.objects.get(username=email)
@@ -85,10 +85,10 @@ class Login(APIView):
                 return Response({
                     "responseCode": "000",
                     "responseMessage": "Verification email sent successfully",
-                    # "data": {"user": serializer.data,
-                    #             "accessToken": accessToken,
-                    #             "refreshToken": str(refreshToken)
-                    #             }
+                    "data": {"user": serializer.data,
+                                "accessToken": accessToken,
+                                "refreshToken": str(refreshToken)
+                                }
                 })
             else:
                 return Response({
@@ -217,24 +217,23 @@ class VerifyOTP(APIView):
     post:Verify OTP
     '''
 
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     @swagger_auto_schema(
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            required=['token', 'email'],
+            required=['token'],
             properties={
                 'token': openapi.Schema(type=openapi.TYPE_STRING),
-                'email': openapi.Schema(type=openapi.FORMAT_EMAIL)
             },
         ),
-        # security=[{'Bearer': []}],
+        security=[{'Bearer': []}],
         responses={201: UserSerializer()}
     )
     def post(self, request, format=None):
         try:
 
-            user = CustomUser.objects.get(username=request.data['email'])
+            user = CustomUser.objects.get(username=request.user.email)
         except Exception as e:
             return Response({
                 "responseCode": "111",
