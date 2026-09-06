@@ -42,7 +42,6 @@ importlib_metadata==8.4.0
 inflection==0.5.1
 isodate==0.7.2
 Jinja2==3.1.4
-jiter==0.6.1
 jsonschema==4.23.0
 jsonschema-path==0.3.3
 jsonschema-specifications==2023.12.1
@@ -55,7 +54,6 @@ msal-extensions==1.2.0
 multidict==6.1.0
 nest-asyncio==1.6.0
 numpy==2.1.1
-openai==1.52.2
 openapi-core==0.19.4
 openapi-schema-validator==0.6.2
 openapi-spec-validator==0.7.1
